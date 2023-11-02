@@ -19,7 +19,7 @@ class Tree {
 
     createBST(array, start, end) {
         if (start > end) return null
-        const mid = Math.ceil((start + end) / 2)
+        const mid = Math.floor((start + end) / 2)
         const current = new Node(array[mid])
 
         current.left = this.createBST(array, start, mid-1)
@@ -214,6 +214,69 @@ class Tree {
         callback(node)
     }
 
+    height(node){
+        return this.heightRec(node, 0)
+    }
+    heightRec(node, h){
+        if (node === null) return h-1
+
+        h += 1
+        
+        const l = this.heightRec(node.left, h)
+        const r = this.heightRec(node.right, h)
+
+        if (l > r) return l
+        else return r
+    }
+
+    depth(target){
+        return this.depthRec(this.root, target, 0)
+    }
+    depthRec(node, target, h){
+        if (node === null) return -1
+        if (node === target){
+            return h
+        }
+        h += 1
+        
+        const l = this.depthRec(node.left, target, h)
+        const r = this.depthRec(node.right, target, h)
+
+        if (l > r) return l
+        else return r
+    }
+
+    isBalanced(){
+        const l = this.isBalancedRec(this.root.left)
+        const r = this.isBalancedRec(this.root.right)
+        if (l === r) return true
+        else return false
+    }
+    isBalancedRec(node){
+        if (node === null) return -1
+        
+        let n = 2
+        n += this.isBalancedRec(node.left)
+        n += this.isBalancedRec(node.right)
+
+        return n
+    }
+
+    rebalance(){
+        const values = [];
+        this.rebalanceRec(this.root, (node) => {
+            if (node.data !== null) values.push(node.data);
+        })
+        this.root = this.buildTree(values)
+    }
+    rebalanceRec(node, callback){
+        if (node == null) return
+
+        this.postOrderRec(node.left, callback)
+        this.postOrderRec(node.right, callback)
+        callback(node)
+    }
+
 }
 
 const prettyPrint = (node, prefix = "", isLeft = true) => {
@@ -240,8 +303,11 @@ const addLog = (node) => {
 const myArray = [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324]
 const myTree = new Tree(myArray)
 myTree.insert(2)
-myTree.insert(14)
 myTree.insert(15)
-myTree.delete(15)
 prettyPrint(myTree.root)
-console.log(myTree.postOrder(addLog))
+console.log(myTree.inOrder())
+console.log(myTree.postOrder())
+console.log(myTree.preOrder())
+console.log(myTree.isBalanced())
+myTree.rebalance()
+prettyPrint(myTree.root)
