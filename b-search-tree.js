@@ -127,9 +127,93 @@ class Tree {
         return node
     }
 
-    levelOrder(callback){
-        
+    getValue = (node) =>{
+        return node.data
     }
+
+    levelOrder(callback = this.getValue){
+        if (this.root == null) return
+
+        const values = []
+
+        let queue = [this.root]
+        while (queue.length > 0){
+            const nextQueue = []
+            for (let i = 0; i < queue.length; i++) {
+                const node = queue[i];
+                if (node == null) continue
+
+                nextQueue.push(node.left)
+                nextQueue.push(node.right)
+
+                values.push(callback(node))
+            }
+            queue = nextQueue
+        }
+
+        return values
+    }
+
+    inOrder(callback){
+        if (typeof callback === "function"){
+            this.inOrderRec(this.root, callback)
+        }
+        else{
+            const values = [];
+            this.inOrderRec(this.root, (node) => {
+                values.push(node.data);
+            });
+            return values
+        }
+    }
+    inOrderRec(node, callback){
+        if (node == null) return
+
+        this.inOrderRec(node.left, callback)
+        callback(node)
+        this.inOrderRec(node.right, callback)
+    }
+
+    preOrder(callback){
+        if (typeof callback === "function"){
+            this.preOrderRec(this.root, callback)
+        }
+        else{
+            const values = [];
+            this.preOrderRec(this.root, (node) => {
+                values.push(node.data);
+            });
+            return values
+        }
+    }
+    preOrderRec(node, callback){
+        if (node == null) return
+
+        callback(node)
+        this.preOrderRec(node.left, callback)
+        this.preOrderRec(node.right, callback)
+    }
+
+    postOrder(callback){
+        if (typeof callback === "function"){
+            this.postOrderRec(this.root, callback)
+        }
+        else{
+            const values = [];
+            this.postOrderRec(this.root, (node) => {
+                values.push(node.data);
+            });
+            return values
+        }
+    }
+    postOrderRec(node, callback){
+        if (node == null) return
+
+        this.postOrderRec(node.left, callback)
+        this.postOrderRec(node.right, callback)
+        callback(node)
+    }
+
 }
 
 const prettyPrint = (node, prefix = "", isLeft = true) => {
@@ -145,14 +229,19 @@ const prettyPrint = (node, prefix = "", isLeft = true) => {
     }
   };
 
+const addOneLog = (node) => {
+    node.data += 1
+    console.log(node.data)
+}
+const addLog = (node) => {
+    console.log(node.data)
+}
+
 const myArray = [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324]
 const myTree = new Tree(myArray)
 myTree.insert(2)
-myTree.insert(13)
 myTree.insert(14)
 myTree.insert(15)
-myTree.delete(13)
-myTree.delete(1)
 myTree.delete(15)
 prettyPrint(myTree.root)
-console.log(myTree.find(23))
+console.log(myTree.postOrder(addLog))
